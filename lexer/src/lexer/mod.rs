@@ -147,7 +147,7 @@ impl Lexer {
             if self.is_at_end() {
                 break;
             }
-            
+
             self.advance();
         }
 
@@ -222,14 +222,6 @@ mod tests {
         );
     }
 
-    // #[ignore]
-    // #[test]
-    // fn test_arbitrary_variable_declration() {
-    //     let file = "this_is_a_variable 24224";
-    //     let mut lexer = Lexer::new(file.to_string());
-    //     let tokens = lexer.tokenize();
-    // }
-
     #[test]
     fn test_tokenize() {
         let file = "# Receive events from 24224/tcp
@@ -241,8 +233,6 @@ mod tests {
 
         let mut lexer = Lexer::new(file.to_string());
         let tokens = lexer.tokenize();
-
-        println!("{:?}", tokens);
 
         assert_eq!(
             tokens[0],
@@ -262,4 +252,50 @@ mod tests {
         assert_eq!(tokens[6], Token::Port(24224));
         assert_eq!(tokens[7], Token::LeftAngle);
     }
+
+    #[test]
+    #[should_panic(expected = "Unknown identifier: abc")]
+    fn test_unknown_identifier() {
+        let file = "abc";
+        let mut lexer = Lexer::new(file.to_string());
+        lexer.tokenize();
+    }
+
+    #[test]
+    fn test_parse_until_newline() {
+        let file = "# Receive events from 24224/tcp\n";
+        let mut lexer = Lexer::new(file.to_string());
+        let result = lexer.parse_until_newline();
+
+        assert_eq!(result, "# Receive events from 24224/tcp");
+    }
+
+    // #[test]
+    // fn test_parse_at_sign() {
+    //     let file = "@type forward";
+    //     let mut lexer = Lexer::new(file.to_string());
+    //     let result = lexer.parse_at_sign();
+
+    //     assert_eq!(result.ident, "type");
+    //     assert_eq!(result.args, "forward");
+    // }
+
+    #[test]
+    fn test_parse_until_non_ident() {
+        let file = "port 24224";
+        let mut lexer = Lexer::new(file.to_string());
+        let result = lexer.parse_until_non_ident();
+
+        assert_eq!(result, "port");
+    }
+
+    #[test]
+    fn test_skip_whitespace() {
+        let file = "  \n  \t  \n  port 24224";
+        let mut lexer = Lexer::new(file.to_string());
+        lexer.skip_whitespace();
+
+        assert_eq!(lexer.current, 'p');
+    }
+
 }
