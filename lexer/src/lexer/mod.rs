@@ -17,7 +17,13 @@ impl Lexer {
         let line = 1;
         let current = input[pos];
 
-        Self { input, pos, line, current, tokens: Vec::new() }
+        Self {
+            input,
+            pos,
+            line,
+            current,
+            tokens: Vec::new(),
+        }
     }
 
     pub fn tokenize(&mut self) -> Vec<Token> {
@@ -33,7 +39,8 @@ impl Lexer {
                 '#' => {
                     self.advance();
                     let comments_literal = self.parse_until_newline();
-                    self.tokens.push(Token::HashTag(comments_literal));
+                    self.tokens
+                        .push(Token::HashTag(comments_literal.trim().to_string()));
                 }
                 '"' => {
                     self.advance();
@@ -89,7 +96,11 @@ impl Lexer {
     }
 
     fn peek(&self) -> char {
-        if self.pos + 1 < self.input.len() { self.input[self.pos + 1] } else { '\0' }
+        if self.pos + 1 < self.input.len() {
+            self.input[self.pos + 1]
+        } else {
+            '\0'
+        }
     }
     fn advance(&mut self) -> char {
         self.pos += 1;
@@ -122,10 +133,9 @@ impl Lexer {
     fn parse_until_non_ident(&mut self) -> String {
         let mut ident = vec![];
 
-        while
-            self.current.is_ascii_lowercase() ||
-            self.current.is_ascii_uppercase() ||
-            self.current.is_ascii_digit()
+        while self.current.is_ascii_lowercase()
+            || self.current.is_ascii_uppercase()
+            || self.current.is_ascii_digit()
         {
             ident.push(self.current);
             self.advance();
@@ -151,8 +161,7 @@ mod tests {
 
     #[test]
     fn test_tokenize() {
-        let file =
-            "# Receive events from 24224/tcp
+        let file = "# Receive events from 24224/tcp
 # This is used by log forwarding and the fluent-cat command
 <source>
   @type forward
@@ -164,17 +173,23 @@ mod tests {
 
         println!("{:?}", tokens);
 
-        assert_eq!(tokens[0], Token::HashTag(" Receive events from 24224/tcp".to_string()));
+        assert_eq!(
+            tokens[0],
+            Token::HashTag("Receive events from 24224/tcp".to_string())
+        );
         assert_eq!(
             tokens[1],
             Token::HashTag(
-                " This is used by log forwarding and the fluent-cat command".to_string()
+                "This is used by log forwarding and the fluent-cat command".to_string()
             )
         );
         assert_eq!(tokens[2], Token::LeftAngle);
         assert_eq!(tokens[3], Token::Source);
         assert_eq!(tokens[4], Token::RightAngle);
-        assert_eq!(tokens[5], Token::AtSign(token::AtSignIdent::Type("forward".to_string())));
+        assert_eq!(
+            tokens[5],
+            Token::AtSign(token::AtSignIdent::Type("forward".to_string()))
+        );
         assert_eq!(tokens[6], Token::Port(24224));
         assert_eq!(tokens[7], Token::LeftAngle);
     }
