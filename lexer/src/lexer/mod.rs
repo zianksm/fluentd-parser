@@ -27,7 +27,10 @@ impl Lexer {
     }
 
     pub fn tokenize(&mut self) -> Vec<Token> {
-        while self.peek() != '\0' {
+        while !self.is_at_end() {
+            let current = self.current;
+            println!("current: {}", current);
+
             self.skip_whitespace();
 
             match self.current {
@@ -95,6 +98,10 @@ impl Lexer {
         self.tokens.clone()
     }
 
+    fn is_at_end(&self) -> bool {
+        self.peek() == '\0'
+    }
+
     fn peek(&self) -> char {
         if self.pos + 1 < self.input.len() {
             self.input[self.pos + 1]
@@ -103,11 +110,12 @@ impl Lexer {
         }
     }
     fn advance(&mut self) -> char {
-        self.pos += 1;
-
-        if self.pos < self.input.len() {
-            self.current = self.input[self.pos];
+        if self.is_at_end() {
+            return '\0';
         }
+
+        self.pos += 1;
+        self.current = self.input[self.pos];
 
         self.current
     }
@@ -133,15 +141,23 @@ impl Lexer {
     fn parse_until_non_ident(&mut self) -> String {
         let mut ident = vec![];
 
-        while self.current.is_ascii_lowercase()
-            || self.current.is_ascii_uppercase()
-            || self.current.is_ascii_digit()
-        {
+        while self.is_ident() {
             ident.push(self.current);
+            
+            if self.is_at_end() {
+                break;
+            }
+            
             self.advance();
         }
 
         ident.iter().collect::<String>()
+    }
+
+    fn is_ident(&mut self) -> bool {
+        self.current.is_ascii_lowercase()
+            || self.current.is_ascii_uppercase()
+            || self.current.is_ascii_digit()
     }
 
     fn parse_until_newline(&mut self) -> String {
@@ -158,6 +174,61 @@ impl Lexer {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_peek() {
+        let file = "test";
+        let mut lexer = Lexer::new(file.to_string());
+
+        assert_eq!(lexer.peek(), 'e');
+        lexer.advance();
+        assert_eq!(lexer.peek(), 's');
+        lexer.advance();
+        assert_eq!(lexer.peek(), 't');
+        lexer.advance();
+        assert_eq!(lexer.peek(), '\0');
+        assert_eq!(lexer.current, 't');
+    }
+
+    #[test]
+    fn test_advance() {
+        let file = "test";
+        let mut lexer = Lexer::new(file.to_string());
+
+        assert_eq!(lexer.advance(), 'e');
+        assert_eq!(lexer.advance(), 's');
+        assert_eq!(lexer.advance(), 't');
+        assert_eq!(lexer.advance(), '\0');
+    }
+
+    #[test]
+    fn test_variable_declration() {
+        let file = "port 24224";
+        let mut lexer = Lexer::new(file.to_string());
+        let tokens = lexer.tokenize();
+
+        assert_eq!(tokens[0], Token::Port(24224));
+    }
+
+    #[test]
+    fn test_at_sign() {
+        let file = "@type forward";
+        let mut lexer = Lexer::new(file.to_string());
+        let tokens = lexer.tokenize();
+
+        assert_eq!(
+            tokens[0],
+            Token::AtSign(token::AtSignIdent::Type("forward".to_string()))
+        );
+    }
+
+    // #[ignore]
+    // #[test]
+    // fn test_arbitrary_variable_declration() {
+    //     let file = "this_is_a_variable 24224";
+    //     let mut lexer = Lexer::new(file.to_string());
+    //     let tokens = lexer.tokenize();
+    // }
 
     #[test]
     fn test_tokenize() {
@@ -179,9 +250,7 @@ mod tests {
         );
         assert_eq!(
             tokens[1],
-            Token::HashTag(
-                "This is used by log forwarding and the fluent-cat command".to_string()
-            )
+            Token::HashTag("This is used by log forwarding and the fluent-cat command".to_string())
         );
         assert_eq!(tokens[2], Token::LeftAngle);
         assert_eq!(tokens[3], Token::Source);
