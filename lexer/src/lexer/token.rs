@@ -33,8 +33,8 @@ pub enum AtSignIdent {
 impl AtSignIdent {
     pub fn from_str_with_ident(ident: String, args: String) -> Result<Self, String> {
         match ident.as_str() {
-            "type" => Ok(Self::Type(args.to_string())),
-            "include" => Ok(Self::Include(args.to_string())),
+            "type" => Ok(Self::Type(args.trim().to_string())),
+            "include" => Ok(Self::Include(args.trim().to_string())),
             _ => Err(format!("Unknown @ sign identifier: {}", ident)),
         }
     }
