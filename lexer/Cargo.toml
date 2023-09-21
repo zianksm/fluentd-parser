@@ -1,14 +1,16 @@
 [package]
 name = "parser"
 version = "0.1.0"
-authors = ["zian <mynameiszian@gmail.com>"]
-edition = "2018"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["std","console_error_panic_hook"]
+default = ["std", "console_error_panic_hook"]
 std = []
 alloc = []
 
