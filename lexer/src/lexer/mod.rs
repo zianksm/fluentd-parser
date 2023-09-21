@@ -98,10 +98,12 @@ impl Lexer {
         self.tokens.clone()
     }
 
+    #[inline]
     fn is_at_end(&self) -> bool {
         self.peek() == '\0'
     }
 
+    #[inline]
     fn peek(&self) -> char {
         if self.pos + 1 < self.input.len() {
             self.input[self.pos + 1]
@@ -109,6 +111,8 @@ impl Lexer {
             '\0'
         }
     }
+
+    #[inline]
     fn advance(&mut self) -> char {
         if self.is_at_end() {
             return '\0';
@@ -120,6 +124,7 @@ impl Lexer {
         self.current
     }
 
+    #[inline]
     fn skip_whitespace(&mut self) {
         while self.current.is_whitespace() {
             if self.current == '\n' {
@@ -130,6 +135,7 @@ impl Lexer {
         }
     }
 
+    #[inline]
     fn parse_at_sign(&mut self) -> token::AtSignIdent {
         let ident = self.parse_until_non_ident();
         self.advance();
@@ -138,12 +144,13 @@ impl Lexer {
         token::AtSignIdent::from_str_with_ident(ident, args).unwrap()
     }
 
+    #[inline]
     fn parse_until_non_ident(&mut self) -> String {
         let mut ident = vec![];
 
         while self.is_ident() {
             ident.push(self.current);
-            
+
             if self.is_at_end() {
                 break;
             }
@@ -154,12 +161,14 @@ impl Lexer {
         ident.iter().collect::<String>()
     }
 
+    #[inline]
     fn is_ident(&mut self) -> bool {
         self.current.is_ascii_lowercase()
             || self.current.is_ascii_uppercase()
             || self.current.is_ascii_digit()
     }
 
+    #[inline]
     fn parse_until_newline(&mut self) -> String {
         let mut ident = vec![];
         while self.current != '\n' {
@@ -270,15 +279,18 @@ mod tests {
         assert_eq!(result, "# Receive events from 24224/tcp");
     }
 
-    // #[test]
-    // fn test_parse_at_sign() {
-    //     let file = "@type forward";
-    //     let mut lexer = Lexer::new(file.to_string());
-    //     let result = lexer.parse_at_sign();
+    #[test]
+    fn test_parse_at_sign() {
+        let file = "@type forward";
+        let mut lexer = Lexer::new(file.to_string());
+        let result = lexer.parse_at_sign();
 
-    //     assert_eq!(result.ident, "type");
-    //     assert_eq!(result.args, "forward");
-    // }
+        if let token::AtSignIdent::Type(ident) = result {
+            assert_eq!(ident, "forward");
+        } else {
+            panic!("Invalid result: {:?}", result);
+        }
+    }
 
     #[test]
     fn test_parse_until_non_ident() {
@@ -297,5 +309,4 @@ mod tests {
 
         assert_eq!(lexer.current, 'p');
     }
-
 }
