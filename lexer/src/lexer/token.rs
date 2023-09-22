@@ -1,5 +1,8 @@
 use core::convert::TryFrom;
 
+type ArbitraryIdent = String;
+type ArbitraryArgs = String;
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Token {
     LeftAngle,
@@ -22,6 +25,7 @@ pub enum Token {
     System,
     Label,
     Worker,
+    Ident(ArbitraryIdent, ArbitraryArgs),
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]

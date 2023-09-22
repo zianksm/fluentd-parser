@@ -88,7 +88,8 @@ impl Lexer {
                             self.tokens.push(Token::Worker);
                         }
                         _ => {
-                            panic!("Unknown identifier: {}", ident);
+                            let args = self.parse_until_whitespace();
+                            self.tokens.push(Token::Ident(ident, args))
                         }
                     }
                 }
@@ -178,11 +179,30 @@ impl Lexer {
 
         ident.iter().collect::<String>()
     }
+
+    #[inline]
+    fn parse_until_whitespace(&mut self) -> String {
+        let mut ident = vec![];
+        while !self.current.is_whitespace() {
+            ident.push(self.current);
+            self.advance();
+        }
+
+        ident.iter().collect::<String>()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_parse_until_whitespace() {
+        let mut lexer = Lexer::new("hello world".to_string());
+        let result = lexer.parse_until_whitespace();
+
+        assert_eq!(result, "hello");
+    }
 
     #[test]
     fn test_peek() {
@@ -238,7 +258,8 @@ mod tests {
 <source>
   @type forward
   port 24224
-</source>";
+</source>
+";
 
         let mut lexer = Lexer::new(file.to_string());
         let tokens = lexer.tokenize();
