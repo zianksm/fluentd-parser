@@ -27,53 +27,25 @@ macro_rules! impl_type_state {
     };
 }
 
-impl_type_state!(state = ArbitraryIdent,inner type = String);
-impl_type_state!(state = ArbitraryArgs,inner type = String);
-impl_type_state!(state = Events,inner type = String);
-impl_type_state!(state = PortNumber,inner type = String);
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum LexError {
-    InvalidToken(String),
-}
+impl_type_state!(state = Literal,inner type = String);
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Token {
+    Newline,
+    Indetifier(Literal),
     LeftAngle,
     RightAngle,
     // "@"
-    AtSign(AtSignIdent),
-
-    // "#" for comments
-    HashTag(String),
-
+    AtSign,
+    HashTag,
     Quote,
     ForwardSlash,
-
     // "port"
-    Port(PortNumber),
-
+    Port,
     Source,
-    Match(Events),
+    Match,
     Filter,
     System,
     Label,
     Worker,
-    Ident(ArbitraryIdent, ArbitraryArgs),
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum AtSignIdent {
-    Type(String),
-    Include(String),
-}
-
-impl AtSignIdent {
-    pub fn from_str_with_ident(ident: String, args: String) -> Result<Self, LexError> {
-        match ident.as_str() {
-            "type" => Ok(Self::Type(args.trim().to_string())),
-            "include" => Ok(Self::Include(args.trim().to_string())),
-            _ => Err(LexError::InvalidToken(ident)),
-        }
-    }
 }
