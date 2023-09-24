@@ -1,3 +1,5 @@
+use crate::lexer::token::{ArbitraryArgs, ArbitraryIdent};
+
 use self::token::Token;
 
 mod token;
@@ -88,8 +90,10 @@ impl Lexer {
                             self.tokens.push(Token::Worker);
                         }
                         _ => {
+                            self.advance();
                             let args = self.parse_until_whitespace();
-                            self.tokens.push(Token::Ident(ident, args))
+                            self.tokens
+                                .push(Token::Ident(ArbitraryIdent(ident), ArbitraryArgs(args)))
                         }
                     }
                 }
@@ -183,7 +187,7 @@ impl Lexer {
     #[inline]
     fn parse_until_whitespace(&mut self) -> String {
         let mut ident = vec![];
-        while !self.current.is_whitespace() {
+        while !self.current.is_whitespace() && !self.is_at_end() {
             ident.push(self.current);
             self.advance();
         }
@@ -284,11 +288,19 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Unknown identifier: abc")]
-    fn test_unknown_identifier() {
+    fn test_arbitrary_identifier() {
         let file = "abc";
         let mut lexer = Lexer::new(file.to_string());
-        lexer.tokenize();
+
+        let tokens = lexer.tokenize();
+
+        assert_eq!(
+            tokens[0],
+            Token::Ident(
+                ArbitraryIdent("abc".to_string()),
+                ArbitraryArgs("".to_string())
+            )
+        );
     }
 
     #[test]
@@ -304,6 +316,7 @@ mod tests {
     fn test_parse_at_sign() {
         let file = "@type forward";
         let mut lexer = Lexer::new(file.to_string());
+        lexer.advance();
         let result = lexer.parse_at_sign();
 
         if let token::AtSignIdent::Type(ident) = result {

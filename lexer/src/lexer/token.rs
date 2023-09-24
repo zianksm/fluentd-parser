@@ -1,7 +1,12 @@
 use core::convert::TryFrom;
 
-type ArbitraryIdent = String;
-type ArbitraryArgs = String;
+#[derive(Debug, PartialEq, Eq, Clone)]
+
+pub struct ArbitraryIdent(pub(crate) String);
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+
+pub struct ArbitraryArgs(pub(crate) String);
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum LexError {
