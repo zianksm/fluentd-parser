@@ -1,12 +1,36 @@
 use core::convert::TryFrom;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+pub trait TokenTypeStateMarker: ToString + From<String> {}
 
-pub struct ArbitraryIdent(pub(crate) String);
+macro_rules! impl_type_state {
+    ($tt:ident) => {
+        impl alloc::string::ToString for $tt {
+            fn to_string(&self) -> String {
+                self.0.clone()
+            }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+        }
 
-pub struct ArbitraryArgs(pub(crate) String);
+        impl From<String> for $tt {
+            fn from(s: String) -> Self {
+                Self(s)
+            }
+        }
+
+        impl TokenTypeStateMarker for $tt {}
+    };
+
+    (state = $ident:ident, inner type = $tt:tt) => {
+        #[derive(Debug, PartialEq, Eq, Clone)]
+        pub struct $ident(pub(crate) $tt);
+        impl_type_state!($ident);
+    };
+}
+
+impl_type_state!(state = ArbitraryIdent,inner type = String);
+impl_type_state!(state = ArbitraryArgs,inner type = String);
+impl_type_state!(state = Events,inner type = String);
+impl_type_state!(state = PortNumber,inner type = String);
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum LexError {
@@ -27,10 +51,10 @@ pub enum Token {
     ForwardSlash,
 
     // "port"
-    Port(u16),
+    Port(PortNumber),
 
     Source,
-    Match,
+    Match(Events),
     Filter,
     System,
     Label,

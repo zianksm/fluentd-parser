@@ -1,6 +1,6 @@
-use crate::lexer::token::{ArbitraryArgs, ArbitraryIdent};
+use crate::lexer::token::{ ArbitraryArgs, ArbitraryIdent, PortNumber };
 
-use self::token::Token;
+use self::token::{ Token, TokenTypeStateMarker };
 
 mod token;
 
@@ -63,12 +63,12 @@ impl Lexer {
                     self.tokens.push(Token::RightAngle);
                 }
                 _ => {
-                    let ident = self.parse_until_non_ident();
-                    match ident.as_str() {
+                    let ident = self.parse_until_non_ident::<ArbitraryIdent>();
+                    match ident.0.as_str() {
                         "port" => {
                             self.advance();
-                            let port = self.parse_until_non_ident();
-                            self.tokens.push(Token::Port(port.parse::<u16>().unwrap()));
+                            let port = self.parse_until_non_ident::<PortNumber>();
+                            self.tokens.push(Token::Port(port));
                         }
                         "source" => {
                             self.tokens.push(Token::Source);
@@ -91,8 +91,9 @@ impl Lexer {
                         _ => {
                             self.advance();
                             let args = self.parse_until_whitespace();
-                            self.tokens
-                                .push(Token::Ident(ArbitraryIdent(ident), ArbitraryArgs(args)))
+                            self.tokens.push(
+                                Token::Ident(ident, ArbitraryArgs(args))
+                            );
                         }
                     }
                 }
@@ -137,15 +138,15 @@ impl Lexer {
 
     #[inline]
     fn parse_at_sign(&mut self) -> token::AtSignIdent {
-        let ident = self.parse_until_non_ident();
+        let ident = self.parse_until_non_ident::<ArbitraryIdent>();
         self.advance();
-        let args = self.parse_until_non_ident();
+        let args = self.parse_until_non_ident::<ArbitraryArgs>();
 
-        token::AtSignIdent::from_str_with_ident(ident, args).unwrap()
+        token::AtSignIdent::from_str_with_ident(ident.0, args.0).unwrap()
     }
 
     #[inline]
-    fn parse_until_non_ident(&mut self) -> String {
+    fn parse_until_non_ident<T: TokenTypeStateMarker>(&mut self) -> T {
         let mut ident = vec![];
 
         while self.is_ident() {
@@ -158,7 +159,7 @@ impl Lexer {
             self.advance();
         }
 
-        ident.iter().collect::<String>()
+        ident.iter().collect::<String>().into()
     }
 
     #[inline]
@@ -193,6 +194,8 @@ impl Lexer {
 
 #[cfg(test)]
 mod tests {
+    use crate::lexer::token::PortNumber;
+
     use super::*;
 
     #[test]
@@ -270,7 +273,7 @@ mod tests {
         assert_eq!(tokens[3], Token::Source);
         assert_eq!(tokens[4], Token::RightAngle);
         assert_eq!(tokens[5], Token::AtSign(token::AtSignIdent::Type("forward".to_string())));
-        assert_eq!(tokens[6], Token::Port(24224));
+        assert_eq!(tokens[6], Token::Port(PortNumber("24224".to_string())));
         assert_eq!(tokens[7], Token::LeftAngle);
     }
 
@@ -283,10 +286,7 @@ mod tests {
 
         assert_eq!(
             tokens[0],
-            Token::Ident(
-                ArbitraryIdent("abc".to_string()),
-                ArbitraryArgs("".to_string())
-            )
+            Token::Ident(ArbitraryIdent("abc".to_string()), ArbitraryArgs("".to_string()))
         );
     }
 
