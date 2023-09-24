@@ -42,8 +42,7 @@ impl Lexer {
                 '#' => {
                     self.advance();
                     let comments_literal = self.parse_until_newline();
-                    self.tokens
-                        .push(Token::HashTag(comments_literal.trim().to_string()));
+                    self.tokens.push(Token::HashTag(comments_literal.trim().to_string()));
                 }
                 '"' => {
                     self.advance();
@@ -89,7 +88,7 @@ impl Lexer {
                         }
                         _ => {
                             let args = self.parse_until_whitespace();
-                            self.tokens.push(Token::Ident(ident, args))
+                            self.tokens.push(Token::Ident(ident, args));
                         }
                     }
                 }
@@ -106,11 +105,7 @@ impl Lexer {
 
     #[inline]
     fn peek(&self) -> char {
-        if self.pos + 1 < self.input.len() {
-            self.input[self.pos + 1]
-        } else {
-            '\0'
-        }
+        if self.pos + 1 < self.input.len() { self.input[self.pos + 1] } else { '\0' }
     }
 
     #[inline]
@@ -164,9 +159,9 @@ impl Lexer {
 
     #[inline]
     fn is_ident(&mut self) -> bool {
-        self.current.is_ascii_lowercase()
-            || self.current.is_ascii_uppercase()
-            || self.current.is_ascii_digit()
+        self.current.is_ascii_lowercase() ||
+            self.current.is_ascii_uppercase() ||
+            self.current.is_ascii_digit()
     }
 
     #[inline]
@@ -245,15 +240,13 @@ mod tests {
         let mut lexer = Lexer::new(file.to_string());
         let tokens = lexer.tokenize();
 
-        assert_eq!(
-            tokens[0],
-            Token::AtSign(token::AtSignIdent::Type("forward".to_string()))
-        );
+        assert_eq!(tokens[0], Token::AtSign(token::AtSignIdent::Type("forward".to_string())));
     }
 
     #[test]
     fn test_tokenize() {
-        let file = "# Receive events from 24224/tcp
+        let file =
+            "# Receive events from 24224/tcp
 # This is used by log forwarding and the fluent-cat command
 <source>
   @type forward
@@ -264,10 +257,7 @@ mod tests {
         let mut lexer = Lexer::new(file.to_string());
         let tokens = lexer.tokenize();
 
-        assert_eq!(
-            tokens[0],
-            Token::HashTag("Receive events from 24224/tcp".to_string())
-        );
+        assert_eq!(tokens[0], Token::HashTag("Receive events from 24224/tcp".to_string()));
         assert_eq!(
             tokens[1],
             Token::HashTag("This is used by log forwarding and the fluent-cat command".to_string())
@@ -275,10 +265,7 @@ mod tests {
         assert_eq!(tokens[2], Token::LeftAngle);
         assert_eq!(tokens[3], Token::Source);
         assert_eq!(tokens[4], Token::RightAngle);
-        assert_eq!(
-            tokens[5],
-            Token::AtSign(token::AtSignIdent::Type("forward".to_string()))
-        );
+        assert_eq!(tokens[5], Token::AtSign(token::AtSignIdent::Type("forward".to_string())));
         assert_eq!(tokens[6], Token::Port(24224));
         assert_eq!(tokens[7], Token::LeftAngle);
     }
@@ -304,6 +291,7 @@ mod tests {
     fn test_parse_at_sign() {
         let file = "@type forward";
         let mut lexer = Lexer::new(file.to_string());
+        lexer.advance();
         let result = lexer.parse_at_sign();
 
         if let token::AtSignIdent::Type(ident) = result {
