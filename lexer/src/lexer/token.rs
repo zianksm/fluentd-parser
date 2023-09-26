@@ -8,7 +8,6 @@ macro_rules! impl_type_state {
             fn to_string(&self) -> String {
                 self.0.clone()
             }
-
         }
 
         impl From<String> for $tt {
@@ -31,7 +30,9 @@ impl_type_state!(state = Literal,inner type = String);
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Token {
+    Dot,
     Newline,
+    Whitespace,
     Indetifier(Literal),
     LeftAngle,
     RightAngle,
@@ -48,4 +49,13 @@ pub enum Token {
     System,
     Label,
     Worker,
+}
+
+impl Token {
+    pub fn is_non_ident(str: &str) -> bool {
+        match str {
+            "." | "\n" | " " | "<" | ">" | "@" | "#" | "\"" | "/" => true,
+            _ => false,
+        }
+    }
 }
