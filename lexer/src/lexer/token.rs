@@ -30,25 +30,48 @@ impl_type_state!(state = Literal,inner type = String);
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Token {
+    // "."
     Dot,
+    // "\n"
     Newline,
+    // " "
     Whitespace,
+    // "arbitrary identifier (name, db, etc.)"
     Indetifier(Literal),
+    // "<"
     LeftAngle,
+    // ">"
     RightAngle,
+    // "{"
+    LeftCurly,
+    // "}"
+    RightCurly,
     // "@"
     AtSign,
+    // "#"
     HashTag,
+    // " " "
     Quote,
+    // "/"
     ForwardSlash,
     // "port"
     Port,
+    // "source"
     Source,
+    // "match"
     Match,
+    // "filter"
     Filter,
+    // "system"
     System,
+    // "label"
     Label,
+    // "worker"
     Worker,
+    // "record"
+    Record,
+    // "buffer"
+    Buffer
 }
 
 impl Token {
