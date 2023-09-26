@@ -71,14 +71,33 @@ pub enum Token {
     // "record"
     Record,
     // "buffer"
-    Buffer
+    Buffer,
 }
 
 impl Token {
-    pub fn is_non_ident(str: &str) -> bool {
+    pub fn is_non_ident(str: &char) -> bool {
         match str {
-            "." | "\n" | " " | "<" | ">" | "@" | "#" | "\"" | "/" => true,
+            '.' | '\n' | ' ' | '<' | '>' | '@' | '#' | '\'' | '/' => true,
             _ => false,
+        }
+    }
+
+    pub fn is_ident(str: &char) -> bool {
+        !Self::is_non_ident(str)
+    }
+
+    pub fn infer_keyword(str: &str) -> Self {
+        match str {
+            "port" => Self::Port,
+            "source" => Self::Source,
+            "match" => Self::Match,
+            "filter" => Self::Filter,
+            "system" => Self::System,
+            "label" => Self::Label,
+            "worker" => Self::Worker,
+            "record" => Self::Record,
+            "buffer" => Self::Buffer,
+            _ => Self::Indetifier(Literal(String::from(str))),
         }
     }
 }
