@@ -2,7 +2,7 @@ use crate::lexer::token::Literal;
 
 use self::token::{Token, TokenTypeStateMarker};
 
-mod token;
+pub mod token;
 
 pub struct Lexer {
     input: Vec<char>,

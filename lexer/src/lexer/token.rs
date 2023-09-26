@@ -1,5 +1,7 @@
 use core::convert::TryFrom;
 
+use serde::{Deserialize, Serialize};
+
 pub trait TokenTypeStateMarker: ToString + From<String> {}
 
 macro_rules! impl_type_state {
@@ -20,7 +22,7 @@ macro_rules! impl_type_state {
     };
 
     (state = $ident:ident, inner type = $tt:tt) => {
-        #[derive(Debug, PartialEq, Eq, Clone)]
+        #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
         pub struct $ident(pub(crate) $tt);
         impl_type_state!($ident);
     };
@@ -28,7 +30,7 @@ macro_rules! impl_type_state {
 
 impl_type_state!(state = Literal,inner type = String);
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub enum Token {
     // "."
     Dot,
