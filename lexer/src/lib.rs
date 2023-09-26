@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-mod lexer;
+pub mod lexer;
 mod utils;
 extern crate alloc;
 
