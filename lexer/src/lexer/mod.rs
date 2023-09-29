@@ -1,6 +1,6 @@
 use crate::lexer::token::Literal;
 
-use self::token::{Token, TokenTypeStateMarker};
+use self::token::{ Token, TokenTypeStateMarker };
 
 pub mod token;
 
@@ -45,6 +45,15 @@ impl Lexer {
                 '#' => self.tokens.push(Token::HashTag),
                 '"' => self.tokens.push(Token::Quote),
                 '/' => self.tokens.push(Token::ForwardSlash),
+                '\\' => self.tokens.push(Token::BackSlash),
+                '(' => self.tokens.push(Token::LeftParen),
+                ')' => self.tokens.push(Token::RightParen),
+                '[' => self.tokens.push(Token::LeftBracket),
+                ']' => self.tokens.push(Token::RightBracket),
+                ',' => self.tokens.push(Token::Comma),
+                ';' => self.tokens.push(Token::Semicolon),
+                ':' => self.tokens.push(Token::Colon),
+                '=' => self.tokens.push(Token::Equals),
                 _ => {
                     let ident = self.parse_ident();
                     self.tokens.push(ident);
@@ -69,11 +78,7 @@ impl Lexer {
 
     #[inline]
     fn peek(&self) -> char {
-        if self.pos + 1 < self.input.len() {
-            self.input[self.pos + 1]
-        } else {
-            '\0'
-        }
+        if self.pos + 1 < self.input.len() { self.input[self.pos + 1] } else { '\0' }
     }
 
     #[inline]
@@ -107,7 +112,6 @@ impl Lexer {
 
 #[cfg(test)]
 mod tests {
-
     macro_rules! literal {
         ($expr:expr) => {
             Token::Indetifier(String::from($expr).into())
@@ -117,7 +121,8 @@ mod tests {
 
     #[test]
     fn test_tokenize() {
-        let input = "
+        let input =
+            "
 <match pattern>
   @type forward
   <buffer>
@@ -125,8 +130,7 @@ mod tests {
     path /path/to/buffer/forward
   </buffer>
 </match>
-"
-        .to_string();
+".to_string();
 
         println!("{:?}\n\n", input);
         let mut lexer = Lexer::new(input);

@@ -1,6 +1,6 @@
 use core::convert::TryFrom;
 
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 
 pub trait TokenTypeStateMarker: ToString + From<String> {}
 
@@ -48,6 +48,22 @@ pub enum Token {
     LeftCurly,
     // "}"
     RightCurly,
+    // "("
+    LeftParen,
+    // ")"
+    RightParen,
+    // "["
+    LeftBracket,
+    // "]"
+    RightBracket,
+    // ","
+    Comma,
+    // ";"
+    Semicolon,
+    // ":"
+    Colon,
+    // " = "
+    Equals,
     // "@"
     AtSign,
     // "#"
@@ -56,6 +72,8 @@ pub enum Token {
     Quote,
     // "/"
     ForwardSlash,
+    //"\"
+    BackSlash,
     // "port"
     Port,
     // "source"
