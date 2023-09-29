@@ -11,8 +11,9 @@ crate-type = ["cdylib", "rlib"]
 
 [features]
 default = ["std", "console_error_panic_hook"]
-std = ["serde/derive"]
+std = ["serde/derive", "token"]
 alloc = []
+token = []
 
 [dependencies]
 wasm-bindgen = { version = "0.2.84", features = ["serde-serialize"] }

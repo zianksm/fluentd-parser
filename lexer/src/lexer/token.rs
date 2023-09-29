@@ -30,6 +30,7 @@ macro_rules! impl_type_state {
 
 impl_type_state!(state = Literal,inner type = String);
 
+#[cfg(feature = "token")]
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub enum Token {
     // "."
@@ -94,6 +95,8 @@ pub enum Token {
     Buffer,
 }
 
+
+#[cfg(feature = "token")]
 impl Token {
     pub fn is_non_ident(str: &char) -> bool {
         match str {
