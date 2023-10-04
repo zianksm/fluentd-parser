@@ -100,7 +100,7 @@ pub enum Token {
 impl Token {
     pub fn is_non_ident(str: &char) -> bool {
         match str {
-            '.' | '\n' | ' ' | '<' | '>' | '@' | '#' | '\'' | '/' => true,
+            '.' | '\n' | ' ' | '<' | '>' | '{' | '}' | '(' | ')' | '[' | ']' | ',' | ';' | ':' | '=' | '@' | '#' | '"' | '/' | '\\' => true,
             _ => false,
         }
     }
