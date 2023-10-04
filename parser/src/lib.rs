@@ -2,7 +2,7 @@ mod utils;
 
 use wasm_bindgen::prelude::*;
 fn main() {
-    token::lexer::token::
+    token::lexer::token::Literal
 }
 #[wasm_bindgen]
 extern "C" {

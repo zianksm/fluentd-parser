@@ -22,7 +22,8 @@ macro_rules! impl_type_state {
     };
 
     (state = $ident:ident, inner type = $tt:tt) => {
-        #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+        #[derive(Debug, PartialEq, Eq, Clone)]
+        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
         pub struct $ident(pub(crate) $tt);
         impl_type_state!($ident);
     };
@@ -31,7 +32,9 @@ macro_rules! impl_type_state {
 impl_type_state!(state = Literal,inner type = String);
 
 #[cfg(feature = "token")]
-#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum Token {
     // "."
     Dot,
