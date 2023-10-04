@@ -1,5 +1,5 @@
 [package]
-name = "fluentd_lexer"
+name = "lexer"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,7 +11,9 @@ crate-type = ["cdylib", "rlib"]
 
 [features]
 default = ["std", "console_error_panic_hook"]
-std = ["serde/derive", "token"]
+std = ["serde/derive", "js", "lex", "alloc", "token"]
+lex = []
+js = []
 alloc = []
 token = []
 

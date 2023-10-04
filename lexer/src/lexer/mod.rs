@@ -4,6 +4,7 @@ use self::token::{ Token, TokenTypeStateMarker };
 
 pub mod token;
 
+#[cfg(feature = "lex")]
 pub struct Lexer {
     input: Vec<char>,
     pos: usize,
